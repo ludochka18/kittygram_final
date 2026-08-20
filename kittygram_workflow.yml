@@ -1,11 +1,7 @@
-
-
 name: Kittygram workflow
 
 on:
   push:
-    branches:
-      - main
 
 jobs:
   # ============================================================
@@ -100,6 +96,7 @@ jobs:
   build_backend:
     name: Build and push backend
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
 
     needs:
       - backend_tests
@@ -133,6 +130,7 @@ jobs:
   build_frontend:
     name: Build and push frontend
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
 
     needs:
       - backend_tests
@@ -166,6 +164,7 @@ jobs:
   build_gateway:
     name: Build and push gateway
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
 
     needs:
       - backend_tests
@@ -199,6 +198,7 @@ jobs:
   deploy:
     name: Deploy Kittygram
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
 
     needs:
       - build_backend
@@ -246,13 +246,13 @@ jobs:
 
             sudo docker image prune -f
 
-
   # ============================================================
   # 7. TELEGRAM-УВЕДОМЛЕНИЕ
   # ============================================================
   send_message:
     name: Send Telegram notification
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
 
     needs:
       - deploy
