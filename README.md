@@ -96,13 +96,70 @@ http://localhost:9000
 docker-compose.production.yml
 ```
 
-На сервере необходимо создать `.env` с переменными окружения.
+На сервере должны быть установлены Docker и Docker Compose.
 
-После этого контейнеры можно запустить командой:
+Создайте директорию проекта и перейдите в неё:
+
+```bash
+mkdir -p ~/kittygram
+cd ~/kittygram
+```
+
+Поместите в эту директорию файл `docker-compose.production.yml`.
+
+Создайте файл `.env` с переменными окружения:
+
+```env
+SECRET_KEY=your_secret_key
+POSTGRES_DB=kittygram
+POSTGRES_USER=kittygram_user
+POSTGRES_PASSWORD=your_password
+DB_HOST=db
+DB_PORT=5432
+DEBUG=False
+ALLOWED_HOSTS=your_domain
+```
+
+Загрузите актуальные Docker-образы:
+
+```bash
+docker compose -f docker-compose.production.yml pull
+```
+
+Запустите контейнеры:
 
 ```bash
 docker compose -f docker-compose.production.yml up -d
 ```
+
+Выполните миграции:
+
+```bash
+docker compose -f docker-compose.production.yml exec backend python manage.py migrate
+```
+
+Соберите статические файлы backend:
+
+```bash
+docker compose -f docker-compose.production.yml exec backend python manage.py collectstatic --noinput
+```
+
+Перенесите собранную статику в общий Docker volume:
+
+```bash
+docker compose -f docker-compose.production.yml exec backend mkdir -p /backend_static/static
+docker compose -f docker-compose.production.yml exec backend cp -r /app/collected_static/. /backend_static/static/
+```
+
+Gateway приложения доступен на порту `9000`.
+
+Внешний Nginx на сервере должен проксировать запросы к Kittygram на:
+
+```text
+http://127.0.0.1:9000
+```
+
+В проекте основной production-деплой выполняется автоматически через GitHub Actions после успешного push в ветку `main`.
 
 В production используются образы:
 
