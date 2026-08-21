@@ -9,8 +9,6 @@ Kittygram — веб-приложение для публикации инфор
 Проект доступен по адресу:
 https://kittygram-luda.duckdns.org
 
-## Технологии
-
 ### Backend
 - Python 3.12
 - Django
